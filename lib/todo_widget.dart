@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import 'data/FireStoreUtils.dart';
+import 'data/Todo.dart';
+
 class TodoWedgit extends StatelessWidget {
+  Todo item;
+TodoWedgit(this.item);
   @override
   Widget build(BuildContext context) {
     return Slidable(
@@ -9,10 +14,14 @@ class TodoWedgit extends StatelessWidget {
 
 
       child: Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+          borderRadius: BorderRadius.circular(12)
+        ),
         height: 120,
-        color: Colors.white,
+
         padding: EdgeInsets.all(12),
-        margin:  EdgeInsets.symmetric(vertical: 12),
+        margin:   EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
             Container(
@@ -28,8 +37,9 @@ class TodoWedgit extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Title',style: Theme.of(context).textTheme.headline1,),
-                Text('Subtitle',style: Theme.of(context).textTheme.headline2,),
+                Text(item.title,style: Theme.of(context).textTheme.headline1,),
+                Text(item.description,style: Theme.of(context).textTheme.headline2,),
+
               ],
             )),
             Container(
@@ -46,13 +56,31 @@ class TodoWedgit extends StatelessWidget {
       ),
       actions: [
         IconSlideAction(
+          onTap: (){
+            deleteTodo(item).then((value){
+
+            }).onError((error, stackTrace){
+              showmassege('timedout', context);
+
+            });
+           showmassege('Task deleted succsesfully', context);
+
+
+          },
           color: Colors.transparent,
           iconWidget: Container(
+            decoration: BoxDecoration(
+                color: Colors.red,
+
+                borderRadius: BorderRadius.circular(12)
+             
+                    
+              ),
+
 
 
             margin:  EdgeInsets.symmetric(vertical: 12),
 
-            color: Colors.red,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,5 +96,18 @@ class TodoWedgit extends StatelessWidget {
       ],
 
     );
+  }
+  void showmassege(String m,context){
+
+      showDialog(context: context, builder: (buildContext){
+        return AlertDialog(
+          content: Text(m),
+          actions: [
+            TextButton(onPressed: (){
+              Navigator.pop(buildContext);
+            }, child: Text('ok'))
+          ],
+        );
+      });
   }
 }

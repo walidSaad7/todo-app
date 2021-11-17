@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todoapp/data/FireStoreUtils.dart';
+import 'package:todoapp/data/Todo.dart';
+import 'package:todoapp/extenion.dart';
 import 'package:todoapp/todo_widget.dart';
-
 class TodoList extends StatefulWidget {
   static const String routName='TodolIST';
 
@@ -17,6 +20,8 @@ class _TodoListState extends State<TodoList> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.all(12),
+
       child: Column(
         children: [
 
@@ -69,15 +74,40 @@ class _TodoListState extends State<TodoList> {
                   )
               ),
               focusedDay: focusedDay, firstDay: DateTime.utc(2019), lastDay: DateTime.utc(2030)),
-          Expanded(child: ListView.builder(itemBuilder: (buildContext,index){
-            return TodoWedgit();
-          },itemCount: 10,
-          )
+
+
+          Expanded(
+              child:
+              StreamBuilder<QuerySnapshot<Todo>>(
+          stream:getTodoWithConverter().snapshots(),
+
+              builder: (BuildContext buildContext, AsyncSnapshot<QuerySnapshot<Todo>> snapshot){
+              if(snapshot.hasError){
+              Center(child: Text(snapshot.error.toString()));
+
+    }else if(snapshot.connectionState==ConnectionState.waiting){
+              return Center(child: CircularProgressIndicator());
+
+    }
+    List<Todo>items=  snapshot.data!.docs.map((doc)=>doc.data()).toList();
+            return ListView.builder(itemBuilder: (buildContext,index){
+           return   TodoWedgit(items[index]);
+
+    },itemCount:items.length ,);
+
+    },
 
 
 
 
           )
+
+          )
+
+
+
+
+
 
 
         ],
